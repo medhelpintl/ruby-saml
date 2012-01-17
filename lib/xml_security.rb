@@ -36,10 +36,12 @@ module XMLSecurity
     DSIG = "http://www.w3.org/2000/09/xmldsig#"
 
     attr_accessor :signed_element_id
+    attr_accessor :skip_digest_validation
 
-    def initialize(response)
+    def initialize(response, options={})
       super(response)
       extract_signed_element_id
+      self.skip_digest_validation = options[:skip_digest_validation]
     end
 
     def validate(idp_cert_fingerprint, soft = true)
@@ -85,7 +87,7 @@ module XMLSecurity
         hash                          = Base64.encode64(Digest::SHA1.digest(canon_hashed_element)).chomp
         digest_value                  = REXML::XPath.first(ref, "//ds:DigestValue", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}).text
 
-        if hash != digest_value
+        if skip_digest_validation && (hash != digest_value)
           return soft ? false : (raise Onelogin::Saml::ValidationError.new("Digest mismatch"))
         end
       end
