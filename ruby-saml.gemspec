@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{ruby-saml}
-  s.version = "0.4.8"
+  s.version = "0.4.9"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["OneLogin LLC"]
@@ -24,10 +24,12 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "lib/onelogin/saml.rb",
+     "lib/onelogin/saml/logging.rb",
      "lib/onelogin/saml/authrequest.rb",
      "lib/onelogin/saml/response.rb",
      "lib/onelogin/saml/settings.rb",
      "lib/onelogin/saml/validation_error.rb",
+     "lib/onelogin/saml/metadata.rb",
      "lib/ruby-saml.rb",
      "lib/xml_security.rb",
      "ruby-saml.gemspec",
