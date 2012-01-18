@@ -87,7 +87,7 @@ module XMLSecurity
         hash                          = Base64.encode64(Digest::SHA1.digest(canon_hashed_element)).chomp
         digest_value                  = REXML::XPath.first(ref, "//ds:DigestValue", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}).text
 
-        if skip_digest_validation || (hash != digest_value)
+        if !skip_digest_validation && (hash != digest_value)
           return soft ? false : (raise Onelogin::Saml::ValidationError.new("Digest mismatch"))
         end
       end
