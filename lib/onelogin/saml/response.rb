@@ -14,7 +14,7 @@ module Onelogin::Saml
       raise ArgumentError.new("Response cannot be nil") if response.nil?
       self.options  = options
       self.response = response
-      self.document = XMLSecurity::SignedDocument.new(Base64.decode64(response))
+      self.document = XMLSecurity::SignedDocument.new(Base64.decode64(response), :skip_digest_validation => options[:skip_digest_validation])
     end
 
     def is_valid?
