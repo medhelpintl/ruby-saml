@@ -8,13 +8,14 @@ module Onelogin::Saml
     PROTOCOL  = "urn:oasis:names:tc:SAML:2.0:protocol"
     DSIG      = "http://www.w3.org/2000/09/xmldsig#"
 
-    attr_accessor :options, :response, :document, :settings
+    attr_accessor :options, :response, :document, :settings, :last_error
 
     def initialize(response, options = {})
       raise ArgumentError.new("Response cannot be nil") if response.nil?
       self.options  = options
       self.response = response
       self.document = XMLSecurity::SignedDocument.new(Base64.decode64(response), :skip_digest_validation => options[:skip_digest_validation])
+      self.last_error = nil
     end
 
     def is_valid?
@@ -79,21 +80,29 @@ module Onelogin::Saml
     end
 
     def validate(soft = true)
-      validate_response_state(soft) &&
-      validate_conditions(soft)     &&
-      document.validate(get_fingerprint, soft)
+      status = 
+        validate_response_state(soft) &&
+        validate_conditions(soft)
+      if status
+        status = document.validate(get_fingerprint, soft)
+        self.last_error = document.last_error
+      end
+      status
     end
 
     def validate_response_state(soft = true)
       if response.empty?
+        self.last_error = "Blank response"
         return soft ? false : validation_error("Blank response")
       end
 
       if settings.nil?
+        self.last_error = "No settings on response"
         return soft ? false : validation_error("No settings on response")
       end
 
       if settings.idp_cert_fingerprint.nil? && settings.idp_cert.nil?
+        self.last_error = "No fingerprint or certificate on settings"
         return soft ? false : validation_error("No fingerprint or certificate on settings")
       end
 
@@ -115,12 +124,14 @@ module Onelogin::Saml
 
       if not_before = parse_time(conditions, "NotBefore")
         if Time.now.utc < not_before
+          self.last_error = "Current time is earlier than NotBefore condition"
           return soft ? false : validation_error("Current time is earlier than NotBefore condition")
         end
       end
 
       if not_on_or_after = parse_time(conditions, "NotOnOrAfter")
         if Time.now.utc >= not_on_or_after
+          self.last_error = "Current time is on or after NotOnOrAfter condition"
           return soft ? false : validation_error("Current time is on or after NotOnOrAfter condition")
         end
       end

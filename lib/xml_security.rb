@@ -37,11 +37,13 @@ module XMLSecurity
 
     attr_accessor :signed_element_id
     attr_accessor :skip_digest_validation
+    attr_accessor :last_error
 
     def initialize(response, options={})
       super(response)
       extract_signed_element_id
       self.skip_digest_validation = options[:skip_digest_validation]
+      self.last_error = nil
     end
 
     def validate(idp_cert_fingerprint, soft = true)
@@ -54,6 +56,7 @@ module XMLSecurity
       fingerprint = Digest::SHA1.hexdigest(cert.to_der)
 
       if fingerprint != idp_cert_fingerprint.gsub(/[^a-zA-Z0-9]/,"").downcase
+        self.last_error = "Fingerprint mismatch"
         return soft ? false : (raise Onelogin::Saml::ValidationError.new("Fingerprint mismatch"))
       end
 
@@ -83,12 +86,15 @@ module XMLSecurity
         hashed_element                = REXML::XPath.first(self, "//[@ID='#{uri[1,uri.size]}']")
         canoner                       = XML::Util::XmlCanonicalizer.new(false, true)
         canoner.inclusive_namespaces  = inclusive_namespaces if canoner.respond_to?(:inclusive_namespaces) && !inclusive_namespaces.empty?
-        canon_hashed_element          = canoner.canonicalize(hashed_element)
+        canon_hashed_element          = canoner.canonicalize(hashed_element).gsub(/&\s/,'&amp; ')
         hash                          = Base64.encode64(Digest::SHA1.digest(canon_hashed_element)).chomp
         digest_value                  = REXML::XPath.first(ref, "//ds:DigestValue", {"ds"=>"http://www.w3.org/2000/09/xmldsig#"}).text
 
-        if !skip_digest_validation && (hash != digest_value)
-          return soft ? false : (raise Onelogin::Saml::ValidationError.new("Digest mismatch"))
+        if hash != digest_value
+          self.last_error = "Digest mismatch"
+          if !skip_digest_validation
+            return soft ? false : (raise Onelogin::Saml::ValidationError.new("Digest mismatch"))
+          end
         end
       end
 
@@ -105,7 +111,8 @@ module XMLSecurity
       cert                    = OpenSSL::X509::Certificate.new(cert_text)
 
       if !cert.public_key.verify(OpenSSL::Digest::SHA1.new, signature, canon_string)
-        return soft ? false : (raise ValidationError.new("Key validation error"))
+        self.last_error = "Key validation error"
+        return soft ? false : (raise Onelogin::Saml::ValidationError.new("Key validation error"))
       end
 
       return true
