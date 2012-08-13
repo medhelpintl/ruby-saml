@@ -74,7 +74,8 @@ module Onelogin::Saml
     # Conditions (if any) for the assertion to run
     def conditions
       @conditions ||= begin
-        REXML::XPath.first(document, "/p:Response/a:Assertion[@ID='#{document.signed_element_id[1,document.signed_element_id.size]}']/a:Conditions", { "p" => PROTOCOL, "a" => ASSERTION })
+        # REXML::XPath.first(document, "/p:Response/a:Assertion[@ID='#{document.signed_element_id[1,document.signed_element_id.size]}']/a:Conditions", { "p" => PROTOCOL, "a" => ASSERTION })
+        REXML::XPath.first(document, "/p:Response/a:Assertion/a:Conditions", { "p" => PROTOCOL, "a" => ASSERTION })
       end
     end
 
