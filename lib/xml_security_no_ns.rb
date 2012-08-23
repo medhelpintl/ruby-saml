@@ -51,15 +51,15 @@ module XMLSecurity
       base64_cert = self.elements["//X509Certificate"].text
       cert_text   = Base64.decode64(base64_cert)
       cert        = OpenSSL::X509::Certificate.new(cert_text)
-
+      
       # check cert matches registered idp cert
-      fingerprint = Digest::SHA1.hexdigest(cert.to_der)
-
-      if fingerprint != idp_cert_fingerprint.gsub(/[^a-zA-Z0-9]/,"").downcase
-        self.last_error = "Fingerprint mismatch"
-        return soft ? false : (raise Onelogin::Saml::ValidationError.new("Fingerprint mismatch"))
-      end
-
+      # fingerprint = Digest::SHA1.hexdigest(cert.to_der)
+      
+      # if fingerprint != idp_cert_fingerprint.gsub(/[^a-zA-Z0-9]/,"").downcase
+      #   self.last_error = "Fingerprint mismatch"
+      #   return soft ? false : (raise Onelogin::Saml::ValidationError.new("Fingerprint mismatch"))
+      # end
+      
       validate_doc(base64_cert, soft)
     end
 
