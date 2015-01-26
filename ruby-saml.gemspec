@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{ruby-saml}
-  s.version = "0.4.14"
+  s.version = "0.5.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["OneLogin LLC"]
@@ -32,7 +32,6 @@ Gem::Specification.new do |s|
      "lib/onelogin/saml/metadata.rb",
      "lib/ruby-saml.rb",
      "lib/xml_security.rb",
-     "lib/xml_security_no_ns.rb",
      "ruby-saml.gemspec",
      "test/certificates/certificate1",
      "test/request_test.rb",
@@ -72,12 +71,14 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_development_dependency(%q<ruby-debug>, [">= 0"])
       s.add_development_dependency(%q<mocha>, [">= 0"])
+      s.add_development_dependency(%q<nokogiri>, [">= 1.6.0"])
     else
       s.add_dependency(%q<canonix>, ["~> 0.1"])
       s.add_dependency(%q<uuid>, ["~> 2.3"])
       s.add_dependency(%q<shoulda>, [">= 0"])
       s.add_dependency(%q<ruby-debug>, [">= 0"])
       s.add_dependency(%q<mocha>, [">= 0"])
+      s.add_dependency(%q<nokogiri>, [">= 1.6.0"])
     end
   else
     s.add_dependency(%q<canonix>, ["~> 0.1"])
@@ -85,6 +86,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<shoulda>, [">= 0"])
     s.add_dependency(%q<ruby-debug>, [">= 0"])
     s.add_dependency(%q<mocha>, [">= 0"])
+    s.add_dependency(%q<nokogiri>, [">= 1.6.0"])
   end
 end
 

@@ -1,5 +1,4 @@
 require "xml_security"
-require "xml_security_no_ns"
 require "time"
 
 module Onelogin::Saml
@@ -15,11 +14,7 @@ module Onelogin::Saml
       raise ArgumentError.new("Response cannot be nil") if response.nil?
       self.options  = options
       self.response = response
-      if options[:use_no_ns]
-        self.document = XMLSecurity::SignedDocumentNoNs.new(Base64.decode64(response), :skip_digest_validation => options[:skip_digest_validation])
-      else
-        self.document = XMLSecurity::SignedDocument.new(Base64.decode64(response), :skip_digest_validation => options[:skip_digest_validation])
-      end
+      self.document = XMLSecurity::SignedDocument.new(Base64.decode64(response), :skip_validation => options[:skip_validation], :digest_override => options[:digest_override], :signature_override => options[:signature_override])
       self.last_error = nil
     end
 

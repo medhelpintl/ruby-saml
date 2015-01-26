@@ -12,6 +12,7 @@ begin
     gem.authors = ["OneLogin LLC"]
     gem.add_dependency("canonix","~> 0.1")
     gem.add_dependency("uuid","~> 2.3")
+    gem.add_dependency("nokogiri",">= 1.6.0")
     gem.add_development_dependency "shoulda"
     gem.add_development_dependency "ruby-debug"
     gem.add_development_dependency "mocha"
